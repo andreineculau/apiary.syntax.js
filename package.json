@@ -1,0 +1,27 @@
+{
+    "name": "apiary.syntax.js",
+    "description": "a library to parse apiary.syntax and to convert to code samples",
+    "version": "0.0.1",
+    "homepage": "https://github.com/andreineculau/apiary.syntax.js",
+    "author": "Andrei Neculau <@andreineculau> (http://andreineculau.com)",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/andreineculau/apiary.syntax.js.git"
+    },
+    "dependencies": {
+        "aug": ">=0.0.4",
+        "nodeunit": ">=0.7.4"
+    },
+    "main": "./lib/apiary.syntax.js",
+    "keywords": [
+        "apiary",
+        "apiary.io",
+        "api",
+        "curl",
+        "php",
+        "jquery",
+        "javascript",
+        "code",
+        "sample"
+    ]
+}
