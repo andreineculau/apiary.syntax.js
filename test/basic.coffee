@@ -2,14 +2,15 @@ apiary = require '../lib/apiary.syntax'
 
 exports.parse = (test) ->
   raw = [
-    'GET /x'
-    '> Accept: text/plain'
+    'POST /x?qwe=qwe'
+    '> Accept: application/json'
+    '{"qwe": "qwe"}'
     '< 200'
-    '< Content-Type: text/plain'
-    'qwe'
+    '< Content-Type: application/json'
+    '{"qwe": "qwe"}'
     '< 500'
     '< 404'
-    '< Content-Type: text/plain'
+    '< Content-Type: application/json'
     'Not Found'
   ].join '\n'
   out = apiary.fromRaw(raw)
@@ -17,4 +18,5 @@ exports.parse = (test) ->
   console.log JSON.stringify(out, null, 2)
   console.log apiary.toRaw(out)
   console.log apiary.toCurl(out)
+  console.log apiary.toKurl(out, {json:true})
   test.done()

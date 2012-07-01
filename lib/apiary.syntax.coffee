@@ -4,6 +4,7 @@ if typeof exports is "object" and typeof define isnt "function"
 
 define (require, exports, module) ->
   aug = require "../node_modules/aug/lib/aug"
+  utils = require "./utils"
 
   self =
     reHead: /([A-Z]+) ([A-Za-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\"\(\)\*\+\,\;\=]+)/
@@ -134,6 +135,7 @@ define (require, exports, module) ->
         "curl"
         "--include"
         "--request #{apiary.method}"
+        "--url #{apiary.URI}"
       ]
 
       for headerKey, headerValue of apiary.in.headers
@@ -143,7 +145,42 @@ define (require, exports, module) ->
         body = apiary.in.body.replace '"', '\"'
         result.push "--data \"#{body}\""
 
-      result.push apiary.URI
+      result = result.join "\\\n  "
+      result
+
+    # Convert apiary to kurl command
+    toKurl: (apiary, options = {}) ->
+      apiary = aug {}, apiary
+      URIScheme = utils.getURIScheme apiary.URI
+      query = (if URIScheme.search then URIScheme.search.substr(1).split('&') else [])
+      apiary.URI = [
+        URIScheme.protocol
+        '//'
+        URIScheme.host
+        URIScheme.pathname
+      ].join('')
+
+      result = [
+        "kurl"
+        "--include"
+        "--request #{apiary.method}"
+        "--url #{apiary.URI}"
+      ]
+
+      for q in query
+        result.push "--query #{q}"
+      for headerKey, headerValue of apiary.in.headers
+        headerValue = headerValue.replace '"', '\"'
+        result.push "--header \"#{headerKey}: #{headerValue}\""
+      if apiary.in.body
+        if options.json
+          body = JSON.parse(apiary.in.body)
+          for bodyKey, bodyValue of body
+            bodyValue = JSON.stringify(bodyValue)
+            result.push "--data-json #{bodyKey}=#{bodyValue}"
+        else
+          body = apiary.in.body.replace '"', '\"'
+          result.push "--data \"#{body}\""
 
       result = result.join "\\\n  "
       result
