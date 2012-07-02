@@ -7,7 +7,7 @@ but the javascript counterpart can be compiled with `coffee -c lib/apiary.syntax
 
 The library is a AMD/nodejs module with help from the [UMD patterns](https://github.com/umdjs/umd).
 
-Tests <s>are</s> will be run via [nodeunit](https://github.com/caolan/nodeunit/).
+Tests <del>are</del> *will be* run via [nodeunit](https://github.com/caolan/nodeunit/).
 
 # Basic Usage
 
