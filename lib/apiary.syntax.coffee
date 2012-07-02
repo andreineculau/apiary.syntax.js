@@ -4,45 +4,74 @@ if typeof exports is "object" and typeof define isnt "function"
 
 define (require, exports, module) ->
   aug = require "../node_modules/aug/lib/aug"
-  utils = require "./utils"
 
   self =
-    reHead: /([A-Z]+) ([A-Za-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\"\(\)\*\+\,\;\=]+)/
-    reHeaderKey: /([A-Za-z0-9\-]+)/
-    reHeaderValue: /(.+)/
-    reStatus: /([1-9][0-9]{2,2})/
+    utils:
+      getURIScheme: (URI) ->
+        re = /^((http[s]?|ftp[s]?):\/)?\/?([^:\/\s]+)(:\d+)?((\/[\w\-\.]+)*)\/([\w\-\.]+[^#?\s]*)([^#]*)?(#[\w\-]*)?$/g
 
-    defaultApiary:
-      in:
+        # If URI is already a URIScheme, return it
+        if typeof URI is "object" and "hostname" of URI
+          return URI
+        else
+          if typeof URI isnt "string"
+            URI = URI.toString()
+
+        matches = re.exec(URI)
+        return  unless matches
+
+        protocol = matches[2] + ":"
+        port = matches[4] or ""
+        host = matches[3] + port
+        pathname = matches[5] + "/" + matches[7]
+
+        url: matches[0]
+        protocol: protocol
+        hostname: matches[3]
+        port: port
+        host: host
+        path: matches[5]
+        file: matches[7]
+        pathname: pathname
+        search: matches[8]
+        hash: matches[9]
+
+      reHead: /([A-Z]+) ([A-Za-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\"\(\)\*\+\,\;\=]+)/
+      reHeaderKey: /([A-Za-z0-9\-]+)/
+      reHeaderValue: /(.+)/
+      reStatus: /([1-9][0-9]{2,2})/
+
+      defaultApiary:
+        in:
+          body: undefined
+          headers: undefined
+        method: undefined
+        outs: undefined
+        URI: undefined
+
+      defaultApiaryOut:
         body: undefined
         headers: undefined
-      method: undefined
-      outs: undefined
-      URI: undefined
+        status: undefined
 
-    defaultApiaryOut:
-      body: undefined
-      headers: undefined
-      status: undefined
-
-    defaultOptions:
-      apiURI: "http://localhost"
+      defaultOptions:
+        apiURI: "http://localhost"
 
     fromRaw: (raw, options = {}) ->
-      options = aug {}, self.defaultOptions, options
-      apiary = aug {}, self.defaultApiary
+      options = aug {}, self.utils.defaultOptions, options
+      apiary = aug {}, self.utils.defaultApiary
 
-      reInHeader = new RegExp "^> " + self.reHeaderKey.source + ": " + self.reHeaderValue.source + "$"
-      reOutStatus = new RegExp "^< " + self.reStatus.source + "$"
-      reOutHeader = new RegExp "^< " + self.reHeaderKey.source + ": " + self.reHeaderValue.source + "$"
+      reInHeader = new RegExp "^> " + self.utils.reHeaderKey.source + ": " + self.utils.reHeaderValue.source + "$"
+      reOutStatus = new RegExp "^< " + self.utils.reStatus.source + "$"
+      reOutHeader = new RegExp "^< " + self.utils.reHeaderKey.source + ": " + self.utils.reHeaderValue.source + "$"
 
       lines = raw.trim().replace("\r\n", "\n").split("\n")
 
       # Parse Head
       head = lines.shift().trim()
-      unless self.reHead.test head
+      unless self.utils.reHead.test head
         throw new Error "\"#{head}\" does NOT describe a HTTP method and an URI"
-      [head, apiary.method, apiary.URI] = self.reHead.exec head
+      [head, apiary.method, apiary.URI] = self.utils.reHead.exec head
       if apiary.URI[0] is "/"
         apiary.URI = options.apiURI + apiary.URI
 
@@ -70,7 +99,7 @@ define (require, exports, module) ->
         break  if lines[0].length is 0
         # Intentionally not lines[0].trim().length
 
-        out = aug {}, self.defaultApiaryOut
+        out = aug {}, self.utils.defaultApiaryOut
 
         # Parse Out Status
         status = lines.shift().trim()
@@ -151,7 +180,7 @@ define (require, exports, module) ->
     # Convert apiary to kurl command
     toKurl: (apiary, options = {}) ->
       apiary = aug {}, apiary
-      URIScheme = utils.getURIScheme apiary.URI
+      URIScheme = self.utils.getURIScheme apiary.URI
       query = (if URIScheme.search then URIScheme.search.substr(1).split('&') else [])
       apiary.URI = [
         URIScheme.protocol
