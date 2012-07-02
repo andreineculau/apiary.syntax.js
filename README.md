@@ -14,20 +14,92 @@ Tests <del>are</del> *will be* run via [nodeunit](https://github.com/caolan/node
 ```js
 var apiary = require('apiary');
 var raw = [
-    'GET /x',
-    '> Accept: text/plain',
+    'POST /x?qwe=qwe',
+    '> Accept: application/json',
+    '{"qwe": "qwe"}',
     '< 200',
-    '< Content-Type: text/plain',
-    'qwe',
+    '< Content-Type: application/json',
+    '{"qwe": "qwe"}',
     '< 500',
     '< 404',
-    '< Content-Type: text/plain',
-    'Not Found',
+    '< Content-Type: application/json',
+    'Not Found'
   ].join('\n');
-
 var apiaryObj = apiary.fromRaw(raw);
+```
+
+```js
 console.log(apiaryObj);
+/*
+{
+  "in": {
+    "body": "{\"qwe\": \"qwe\"}",
+    "headers": {
+      "Accept": "application/json"
+    }
+  },
+  "method": "POST",
+  "outs": [
+    {
+      "body": "{\"qwe\": \"qwe\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "status": "200"
+    },
+    {
+      "status": "500"
+    },
+    {
+      "body": "Not Found",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "status": "404"
+    }
+  ],
+  "URI": "http://localhost/x?qwe=qwe"
+}*/
+```
+
+```js
+console.log(apiary.toRaw(apiaryObj));
+/*
+POST http://localhost/x?qwe=qwe
+> Accept: application/json
+{"qwe": "qwe"}
+< 200
+< Content-Type: application/json
+{"qwe": "qwe"}
+< 500
+< 404
+< Content
+*/
+```
+
+```js
 console.log(apiary.toCurl(apiaryObj));
+/*
+curl\
+  --include\
+  --request POST\
+  --url http://localhost/x?qwe=qwe\
+  --header "Accept: application/json"\
+  --data "{"qwe": "qwe"}"
+*/
+```
+
+```js
+console.log(apiary.toKurl(apiaryObj));
+/*
+kurl\
+  --include\
+  --request POST\
+  --url http://localhost/x\
+  --query qwe=qwe\
+  --header "Accept: application/json"\
+  --data-json qwe="qwe"
+*/
 ```
 
 # Comprehensive Usage
