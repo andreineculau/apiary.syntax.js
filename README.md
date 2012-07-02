@@ -1,6 +1,7 @@
 # apiary.syntax.js
 
 A javascript library that parses from/into [apiary.io](http://apiary.io/blueprint)'s syntax.
+Inspired by [apiary.io's language-templates](https://github.com/apiaryio/language-templates).
 
 Source code is written in [coffee-script](http://coffeescript.org/),
 but the javascript counterpart can be compiled with `coffee -c lib/apiary.syntax.coffee`.
