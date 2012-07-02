@@ -103,6 +103,22 @@ kurl\
 */
 ```
 
+```js
+console.log(apiary.toJQuery(apiaryObj));
+/*
+// jQuery 1.6+
+$.ajax({
+  "data": "{\"qwe\": \"qwe\"}",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Length": "14"
+  },
+  "type": "POST",
+  "url": "http://localhost/x?qwe=qwe"
+}).always(function(data, textStatus, jqXHR){console.log(data, textStatus, jqXHR.statusText, jqXHR.status, jqXHR)});
+*/
+```
+
 # Comprehensive Usage
 
 TODO
