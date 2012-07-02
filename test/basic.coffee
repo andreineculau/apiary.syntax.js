@@ -19,4 +19,5 @@ exports.parse = (test) ->
   console.log apiary.toRaw(out)
   console.log apiary.toCurl(out)
   console.log apiary.toKurl(out, {json:true})
+  console.log apiary.toJQuery(out)
   test.done()
